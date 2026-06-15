@@ -6,9 +6,16 @@ const verifyFirebaseToken = require('../middleware/verifyFirebaseToken');
 
 // Ownership guard — user can only touch their own wishlist
 const verifyOwnership = (req, res, next) => {
-  if (req.user.uid !== req.params.userId) {
-    return res.status(403).json({ error: 'Forbidden: cannot access another user\'s wishlist' });
+  const { userId } = req.params;
+
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+    return res.status(400).json({ error: 'Invalid or missing userId param' });
   }
+
+  if (req.user.uid !== userId) {
+    return res.status(403).json({ error: "Forbidden: cannot access another user's wishlist" });
+  }
+
   next();
 };
 
